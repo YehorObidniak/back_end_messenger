@@ -1,0 +1,1118 @@
+<!DOCTYPE html>
+<html lang="en">
+
+{% load static %}
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <script src="https://cdn.jsdelivr.net/npm/he/he.js"></script>
+</head>
+<style>
+    body {
+      background: #2c2c2c;
+      margin: 0;
+      font-family: Inter, -apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Helvetica Neue, Arial, Noto Sans, sans-serif, Apple Color Emoji, Segoe UI Emoji, Segoe UI Symbol, Noto Color Emoji;
+  }
+
+  .chat_container {
+      width: 100%;
+      height: 100%;
+
+  }
+
+  .content_chats {
+      width: 100%;
+      display: flex;
+      height: 100%;
+  }
+
+  .new_message img {
+      width: 3vh;
+      height: 3vh;
+      border-radius: 50%;
+      object-fit: cover;
+  }
+
+
+  .input_container {
+    width: 100%;
+    display: flex;
+    height: 5vh;
+    flex-wrap: nowrap;
+    align-items: flex-end;
+    position: fixed;
+    background-color: white;
+    padding: 0.2vh 0 1vh;
+    overflow: hidden;
+    border-top: 1px solid #c7c7c7;
+    bottom: 0;
+    right: 0;
+    left:0;
+  }
+
+
+  .input_container textarea {
+      width: 87%;
+      height: 3vh;
+      font-size: 2vh;
+      padding: 0.3vh;
+      border: none;
+      border-radius: 5px;
+      margin-left: 0.5vw;
+  }
+
+  .input_container textarea:focus {
+      outline: none;
+      border: none;
+
+  }
+
+
+  .arrow_container {
+      height: 100%;
+      align-items: end;
+      display: flex;
+  }
+
+  .arrow_container img {
+      width: 3vh;
+      height: 3vh;
+      margin-left: 1vw;
+      margin-bottom: 0.3vh;
+  }
+
+  .messages {
+      overflow-y: scroll;
+      padding: 10px;
+      margin-top: 3vh;
+      position: relative;
+      display: flex;
+      flex-direction: column;
+      align-items: flex-start;
+      justify-content: flex-end;
+      margin-bottom: 5vh;
+  }
+
+  .send_button {
+      height: 4vh;
+      width: 4vh;
+      border-radius: 50%;
+      background: #44a8ff;
+      margin-left: 1.5vw;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+  }
+
+  .send_button img {
+      height: 3vh;
+      width: 3vh;
+      margin-left: 1vw;
+
+  }
+
+  .send_button:hover {
+
+      background: #0283f3
+  }
+
+  .time {
+      position: relative;
+      font-size: 1.2vh;
+      height: 100%;
+      display: flex;
+      align-items: flex-end;
+      margin-left: 0.5vw;
+      color: rgb(255, 255, 255);
+      opacity: 0.5;
+  }
+
+  .our_message,.their_message{
+      padding: 1vh;
+      font-size: 2vh;
+      margin: 1vh;
+      color: white;
+
+  }
+
+  .our_message {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    }
+
+  .chat_username_message_us, .chat_username_message_their {
+    color: white;
+    display: block;
+    width: 100%;
+    margin-bottom: 1vh;
+    }
+
+  .chat_username_message_us{
+      text-align: end;
+      right: 1vh;
+  }
+
+  .chat_username_message_their{
+      text-align: start;
+      left: 1vh;
+  }
+
+  .content_us, .content_their {
+      display: flex;
+      padding: 1vh;
+      min-height: 40%; /* the boxes will be at least 40% the height of the parent, but can expand */
+  }
+
+  .content_us{
+      border-radius: 1.125rem 1.125rem 0 1.125rem;
+      background: #44a8ff;
+  }
+
+
+  .content_their {
+      border-radius: 1.125rem 1.125rem 1.125rem 0;
+      background: #5d6164;
+  }
+
+  .img_to_menu{
+      height: 4vh;
+      margin: 1vh;
+  }
+
+  .header_container{
+      z-index: 1;
+      position: fixed;
+      width: 100%;
+      top: 0;
+  }
+
+  .user_chat {
+        background-color: #F3F1F1;
+        height: 60px;
+        margin-top: 2px;
+        display: flex;
+        align-items: center;
+        justify-content: flex-start;
+    }
+
+  .user_chat img {
+      width: 7vh;
+      height: 7vh;
+      border-radius: 50%;
+      object-fit: cover;
+      margin: 5px;
+  }
+
+  img_container {
+      height: 100%;
+      align-items: center;
+      display: flex;
+      margin-left: 0.5vw;
+      overflow: hidden;
+      width: 20%;
+      justify-content: center;
+  }
+
+  .text_user_chat {
+      display: flex;
+      align-items: center;
+      margin-left: 1vw;
+      width: 45%;
+      justify-content: flex-start;
+
+  }
+
+  .name_chat {
+      font-size: large;
+      padding: 10px;
+      width: 68%;
+  }
+
+  .last_text_chat {
+      opacity: 0.7;
+  }
+
+  .content_chats {
+      width: 100%;
+      display: flex;
+      height: 100%;
+  }
+
+  .new_message {
+      height: 100%;
+      align-items: center;
+      display: flex;
+      overflow: hidden;
+      width: 25%;
+      justify-content: flex-end;
+  }
+
+  .new_message img {
+      width: 3vh;
+      height: 3vh;
+      border-radius: 50%;
+      object-fit: cover;
+  }
+
+  .new_message_counter {
+      overflow: hidden;
+      justify-content: center;
+      position: relative;
+      display: flex;
+      width: 3vh;
+      height: 3vh;
+      background: #0000ff80;
+      border-radius: 50%;
+      text-align: center;
+      color: white;
+      font-size: 2vh;
+      font-weight: 400;
+      margin-right: 0.5vw;
+  }
+
+  body.blur-background::after {
+      content: "";
+      position: fixed;
+      top: 0;
+      right: 0;
+      bottom: 0;
+      left: 0;
+      background: rgba(0,0,0,0.5);
+      backdrop-filter: blur(5px); /* this will blur the background */
+      z-index: 500;
+  }
+
+  .zoomed-image {
+      max-width: 50vw;
+      max-height: 40vh;
+      transition: width 0.5s;
+      display:block;
+  }
+
+  .zoomed-view {
+      display: none;
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      max-width: 100vw;
+      max-height: 100vh;
+      z-index: 999;
+  }
+
+  .message{
+      word-wrap: break-word;
+      max-width: 70vw;
+  }
+
+
+    .header {
+        position: fixed;
+        top: 0;
+        background: #2c2c2c;
+        width: 100%;
+    }
+
+  .input-container {
+        position: relative;
+        margin: 8px;
+    }
+
+  .input-icon {
+      position: absolute;
+      left: 11px;
+      top: 50%;
+      transform: translateY(-50%);
+      fill: #333;
+      width: 17px;
+  }
+  .header
+  .input-field {
+      padding: 6px 36px;
+      width: 81%;
+      font-size: 17px;
+      border-radius: 12px;
+      border: none;
+      background: #dedede;
+      height: 23px;
+  }
+
+  .input-field:focus {
+      outline: none;
+      border: none;
+  }
+
+  .content {
+        margin-top: 100px;
+    }
+  .their_message {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-start;
+  }
+
+  .unchecked{
+      background: #5454bf;
+      color: white;
+      border-radius: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 4px;
+      width: 20px
+  }
+    .users_in_chat{
+        color: white;
+        font-size: 15px;
+        opacity: 0.6;
+    }
+    
+    .chat_name{
+        color: white;
+        font-size: 20px;
+    }   
+    .tag {
+        background: #5454bf;
+        color: white;
+        border-radius: 100%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 4px;
+        width: 20px;
+        margin-right: 5px;
+    }
+    .tag svg{
+        fill: white;
+        height: 21px;
+        width: 16px;
+    
+    }
+    .number_chats {
+        height: 32px;
+        font-size: 18px;
+        display: flex;
+        color: white;
+        margin-left: 8px;
+    }
+    
+
+    .taged_message{
+        color: #6fa3ff;
+        text-decoration: underline;
+    }
+    ul {
+        padding: 0;
+        list-style: none;
+        position: relative;
+        max-height: 110px;
+        overflow-y: scroll;
+    }
+
+    li {
+        background: white;
+        padding: 4px;
+        font-size: 16px;
+        font-weight: 500;
+        border: 0.5px solid black;
+    }
+    #userList{
+        
+            display: block;
+            position: fixed;
+            width: 100%;
+            bottom: 20px;
+        
+    }
+    .folders {
+        display: flex;
+        align-items: center;
+        justify-content: space-around;
+        flex-direction: row;
+        margin-bottom: 10px;
+    }
+    .folder {
+        color: white;
+        font-size: 15px;
+        background: #686868;
+        width: 20%;
+        text-align: center;
+        padding: 6px;
+        border: 0.5px solid #8f8f8f;
+        font-weight: 500;
+    }
+    .accident{
+        background: #ff80ec;;
+    }
+    .landing{
+        background:yellow;
+    }
+    .change{
+        background: orange;
+    }
+    .return{
+        background:blue;
+    }
+    .problems {
+        background: #75283c;
+    }
+    .accident_container, .landing_container,change_container, .return_container, .problems_container{
+        display:none;
+    }
+    
+</style>
+
+<body >
+    <div class="header">
+        <div class="input-container">
+
+            <svg class="input-icon" version="1.0" xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 1280.000000 1276.000000" preserveAspectRatio="xMidYMid meet">
+                <g transform="translate(0.000000,1276.000000) scale(0.100000,-0.100000)"
+                    fill="#b6b6b6" stroke="none">
+                    <path d="M4600 12749 c-1217 -85 -2313 -580 -3160 -1429 -788 -790 -1271 -1788 -1404 -2905 -153 -1278 200 -2564 983 -3585 181 -237 501 -570 726 -759 316 -263 641 -473 1020 -657 537 -261 1052 -404 1715 -476 183 -19 720 -16 925 5 703 75 1359 282 1948 614 l98 56 87 -85 c48 -46 805 -782 1683 -1634 877 -853 1618 -1571 1646 -1596 227 -202 530 -311 818 -295 180 10 292 40 460 122 132 65 213 125 323 239 341 355 427 879 217 1323 -62 132 -134 231 -260 359 -60 61 -829 808 -1707 1658 -879 851 -1598 1551 -1598 1555 0 5 25 51 55 102 135 226 282 545 377 814 182 516 271 993 285 1540 20 806 -143 1565 -491 2280 -239 491 -521 893 -896 1279 -379 389 -794 695 -1275 942 -789 404 -1704 594 -2575 533z m502 -1973 c478 -20 1000 -194 1425 -475 1366 -904 1746 -2702 857 -4061 -221 -338 -521 -638 -864 -863 -892 -586 -2052 -635 -2983 -127 -736 401 -1266 1079 -1468 1877 -68 269 -83 398 -83 713 0 236 3 296 23 420 49 316 127 569 260 845 151 314 327 560 576 810 463 465 1049 757 1695 845 9013 355 28 405 23 17 -1 87 -5 157 -7z"></g>
+                    </svg>
+
+            <input class="input-field" type="text" placeholder="Search" onkeyup="searchChats(this.value)">
+            
+        </div>
+        <div class="folders">
+            <div class="folder" onclick="to_users()">Все</div>
+            <div class="folder" onclick="to_folder('accident')">Авария</div>
+            <div class="folder" onclick="to_folder('landing')" >Посадка</div>
+            <div class="folder" onclick="to_folder('change')">Замена</div>
+            <div class="folder" onclick="to_folder('return')">Возврат</div>
+            <div class="folder" onclick="to_folder('problems')">Проблемный</div>
+        </div>
+    </div>
+
+
+    <div class="content">
+        <div class="number_chats">Number of chats: {{number_chats}}</div>
+        
+        <div class="accident_container"></div>
+        <div class="landing_container"></div>
+        <div class="change_container"></div>
+        <div class="return_container"></div>
+        <div class="problems_container"></div>
+
+        <div class="chats">
+
+            {% for chat in chats %}
+                {% if chat.folder == 'accident' %}
+                    <div class="user_chat accident" id="" onclick="enter_chat('{{chat.id}}', '{{chat.driver.id}}')">
+                {% elif chat.folder == 'landing' %}
+                    <div class="user_chat landing" id="" onclick="enter_chat('{{chat.id}}', '{{chat.driver.id}}')">
+                {% elif chat.folder == 'change' %}
+                    <div class="user_chat change" id="" onclick="enter_chat('{{chat.id}}', '{{chat.driver.id}}')">
+                {% elif chat.folder == 'return' %}
+                    <div class="user_chat return" id="" onclick="enter_chat('{{chat.id}}', '{{chat.driver.id}}')">
+                {% elif chat.folder == 'problems'%}
+                    <div class="user_chat problems" id="" onclick="enter_chat('{{chat.id}}', '{{chat.driver.id}}')">
+                {% elif chat.folder == 'default' or un.folder == None or un.folder == '' %}
+                    <div class="user_chat " id="" onclick="enter_chat('{{chat.id}}', '{{chat.driver.id}}')">
+                {% endif %}
+
+                {% if chat.chat.img != None %}
+
+                    <img src="{% static chat.img %}">
+
+                {% endif %}
+
+                    <div class="name_chat">
+                        {{chat.chat.chat_name}}
+                    </div>
+
+                {%if chat.taged%}
+                    <div class="tag">
+                        <svg fill="#000000" height="12px" width="12px" version="1.1" id="Capa_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" 
+                            viewBox="0 0 490.2 490.2" xml:space="preserve">
+                            <g>
+                            <path d="M420.95,61.8C376.25,20.6,320.65,0,254.25,0c-69.8,0-129.3,23.4-178.4,70.3s-73.7,105.2-73.7,175
+                                c0,66.9,23.4,124.4,70.1,172.6c46.9,48.2,109.9,72.3,189.2,72.3c47.8,0,94.7-9.8,140.7-29.5c15-6.4,22.3-23.6,16.2-38.7l0,0
+                                c-6.3-15.6-24.1-22.8-39.6-16.2c-40,17.2-79.2,25.8-117.4,25.8c-60.8,0-107.9-18.5-141.3-55.6c-33.3-37-50-80.5-50-130.4
+                                c0-54.2,17.9-99.4,53.6-135.7c35.6-36.2,79.5-54.4,131.5-54.4c47.9,0,88.4,14.9,121.4,44.7s49.5,67.3,49.5,112.5
+                                c0,30.9-7.6,56.7-22.7,77.2c-15.1,20.6-30.8,30.8-47.1,30.8c-8.8,0-13.2-4.7-13.2-14.2c0-7.7,0.6-16.7,1.7-27.1l18.6-152.1h-64
+                                l-4.1,14.9c-16.3-13.3-34.2-20-53.6-20c-30.8,0-57.2,12.3-79.1,36.8c-22,24.5-32.9,56.1-32.9,94.7c0,37.7,9.7,68.2,29.2,91.3
+                                c19.5,23.2,42.9,34.7,70.3,34.7c24.5,0,45.4-10.3,62.8-30.8c13.1,19.7,32.4,29.5,57.9,29.5c37.5,0,69.9-16.3,97.2-49
+                                c27.3-32.6,41-72,41-118.1C488.05,152.9,465.75,103,420.95,61.8z M273.55,291.9c-11.3,15.2-24.8,22.9-40.5,22.9
+                                c-10.7,0-19.3-5.6-25.8-16.8c-6.6-11.2-9.9-25.1-9.9-41.8c0-20.6,4.6-37.2,13.8-49.8s20.6-19,34.2-19c11.8,0,22.3,4.7,31.5,14.2
+                                s13.8,22.1,13.8,37.9C290.55,259.2,284.85,276.6,273.55,291.9z"/>
+                            </g>
+                        </svg>
+                    </div>
+                {%endif%}
+
+                {% if chat.unrecieved != 0 %}
+
+                    <div class="unchecked">
+                        {{chat.unrecieved}}
+                    </div>
+
+                {%endif%}
+                
+            </div>
+            {% endfor %}
+        </div>
+    
+    </div>
+
+    {% csrf_token %}
+    <script>
+        const csrftoken = document.querySelector('[name=csrfmiddlewaretoken]').value;
+        const chats = JSON.parse(he.decode('{{chats_ser}}'))
+        let unrec_ser = JSON.parse(he.decode('{{chats_ser}}'))
+        const me = '{{me}}';
+        const department = '{{department}}';
+
+        let update = false;
+        let closing = false;
+        let RoomId;
+        let Old;
+        let count = 0;
+        let inChat = false;
+
+        function to_folder(part) {
+            let content = document.querySelector(".content");
+            content.innerHTML = "";
+            console.log(part)
+
+            fetch('/get_unrecieved' + `?user=${me}`)
+                .then(response => response.json())
+                .then(data => {
+                    unrec = JSON.parse(data.unrec);
+                    
+                    chats.map((chat, index) => {
+                        console.log(unrec[index].fields.folder)
+                        if (unrec[index].fields.folder === part) {
+                            content.innerHTML += `
+                                <div class="user_chat ${part}" id="" onclick="enter_chat(${chat.pk}, ${chat.fields.driver})">
+                                    ${chat.fields.img != null ? set_avatar(chat.fields.img) : ''}
+                                    <div class="name_chat">
+                                        ${chat.fields.chat_name}
+                                    </div>
+                                    ${unrec[index].fields.taged ?
+                                    `<div class="tag">
+                                        <svg fill="#000000" height="12px" width="12px" version="1.1" id="Capa_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" 
+                                            viewBox="0 0 490.2 490.2" xml:space="preserve">
+                                            <g>
+                                            <path d="M420.95,61.8C376.25,20.6,320.65,0,254.25,0c-69.8,0-129.3,23.4-178.4,70.3s-73.7,105.2-73.7,175
+                                                c0,66.9,23.4,124.4,70.1,172.6c46.9,48.2,109.9,72.3,189.2,72.3c47.8,0,94.7-9.8,140.7-29.5c15-6.4,22.3-23.6,16.2-38.7l0,0
+                                                c-6.3-15.6-24.1-22.8-39.6-16.2c-40,17.2-79.2,25.8-117.4,25.8c-60.8,0-107.9-18.5-141.3-55.6c-33.3-37-50-80.5-50-130.4
+                                                c0-54.2,17.9-99.4,53.6-135.7c35.6-36.2,79.5-54.4,131.5-54.4c47.9,0,88.4,14.9,121.4,44.7s49.5,67.3,49.5,112.5
+                                                c0,30.9-7.6,56.7-22.7,77.2c-15.1,20.6-30.8,30.8-47.1,30.8c-8.8,0-13.2-4.7-13.2-14.2c0-7.7,0.6-16.7,1.7-27.1l18.6-152.1h-64
+                                                l-4.1,14.9c-16.3-13.3-34.2-20-53.6-20c-30.8,0-57.2,12.3-79.1,36.8c-22,24.5-32.9,56.1-32.9,94.7c0,37.7,9.7,68.2,29.2,91.3
+                                                c19.5,23.2,42.9,34.7,70.3,34.7c24.5,0,45.4-10.3,62.8-30.8c13.1,19.7,32.4,29.5,57.9,29.5c37.5,0,69.9-16.3,97.2-49
+                                                c27.3-32.6,41-72,41-118.1C488.05,152.9,465.75,103,420.95,61.8z M273.55,291.9c-11.3,15.2-24.8,22.9-40.5,22.9
+                                                c-10.7,0-19.3-5.6-25.8-16.8c-6.6-11.2-9.9-25.1-9.9-41.8c0-20.6,4.6-37.2,13.8-49.8s20.6-19,34.2-19c11.8,0,22.3,4.7,31.5,14.2
+                                                s13.8,22.1,13.8,37.9C290.55,259.2,284.85,276.6,273.55,291.9z"/>
+                                            </g>
+                                        </svg>
+                                    </div>` : ''}
+                                    ${unrec[index].fields.unrecieved != 0 ?
+                                    `<div class="unchecked">
+                                ${unrec[index].fields.unrecieved}</div>` : ''}
+                                </div>
+                            `;
+                          
+                        }
+                    });
+                });
+                console.log("Конец")
+        }
+        
+        function iphone(){
+            console.log("1")
+            if (/iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream) {
+            // тут ваш код, який буде виконаний для пристроїв iPhone, iPad і iPod
+            document.body.style.backgroundColor = "red";
+
+            document.querySelector('.input_container').style.cssText = "    width: 100%; display: flex;align-items: flex-end;background-color: white;padding: 0.2vh 0 1vh; overflow: hidden;";
+
+            document.querySelector('.messages').style.cssText = "overflow-y: scroll; padding: 10px; margin-top: 3vh; position: relative; display: flex; flex-direction: column; align-items: flex-start; justify-content: flex-end; padding-bottom: 40vh;";
+
+                }
+        }
+
+        function enter_chat(id, driver_id){
+            RoomId = id;
+
+            let content = document.querySelector(".content");
+            let header = document.querySelector(".header");
+
+            header.style.padding = "6px";
+            header.style.display="flex";
+            header.style.alignItems = "center"
+            content.style.marginBottom ="100px"
+            
+        
+            content.innerHTML=`
+            <div class="chat_container">
+                <div id="messages_container">
+
+            </div>
+            <div>
+
+                <div class="input_container">
+                    <textarea rows="2" placeholder="Write a message.." id="message" onkeydown="filterUsers(event),checkEnter(event)"></textarea>
+                    <div class="send_button" onclick="send()"><img src="{% static 'next.png' %}"></div>
+                </div>
+
+                <div id="userList" style="display: none;">
+                    <ul id="userOptions">
+                    </ul>
+                </div>
+            </div>
+                `
+
+            fetch('{% url "enter_chat" %}' + '?' + new URLSearchParams(`id=${id}&user=${me}`))
+            .then(response => response.json())
+            .then(data => {
+                users = data.departments;
+                let messages = JSON.parse(data.messages)
+                console.log(messages)
+
+                header.innerHTML=`
+                    <svg onclick="to_users()" fill="white" height="20" width="20" version="1.1" id="Icons" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 32 32" xml:space="preserve">
+                            <g><path d="M19.5,28C19.5,28,19.5,28,19.5,28c-1,0-1.8-0.4-2.5-1l-9.3-9.4c-0.9-0.9-0.9-2.3,0-3.1l9.3-9.4c0.7-0.7,1.6-1,2.5-1
+                                    c0,0,0,0,0,0c1,0,1.8,0.4,2.5,1c1.4,1.4,1.4,3.6,0,5l-5.7,5.8c-0.1,0.1-0.1,0.2,0,0.3l5.7,5.8c1.4,1.4,1.4,3.6,0,5
+                                    C21.3,27.6,20.4,28,19.5,28z M8.3,15.1L8.3,15.1L8.3,15.1z"/></g>
+                    </svg> 
+
+                    <div style="margin-left: 20px;">
+                        <div class = "chat_name">${data.chat_name}</div>
+                        <div class = "users_in_chat">${data.users_in_chat} users, 1 driver</div>
+                    </div>`;
+
+                    user_list = document.getElementById("userOptions")
+                    for(let i =0; i < data.departments.length; i++)
+                    {
+                        user_list.innerHTML+=`<li>${data.departments[i]}</li>`;
+                    }
+
+                console.log(data.departments)
+                const types = {'audio':set_audio, 'text': set_text, 'photo':set_photo, 'video':set_video, 'document':set_document, 'tag':set_tag}
+                    
+                messages.map(message => {
+                    if(message.fields.from_user == me){
+                    document.querySelector('#messages_container').innerHTML += `
+                    <div class="our_message">
+                    <div class="chat_username_message_us">
+                        Me
+                    </div>
+                    <div class="content_us">
+                        <div>${message.fields.text}</div>
+                    </div>
+                </div>
+                    `
+                }
+                else{
+                    content = types[message.fields.typeOfMessage](message.fields.text)
+                    document.querySelector('#messages_container').innerHTML += `
+                    <div class="their_message">
+                        <div class="chat_username_message_their">
+                            ${message.fields.departmentName}
+                        </div>
+                        <div class="content_their">
+                            ${content}
+                        </div>
+                    </div>
+                            `
+                }
+            })
+            })
+
+            scroll();
+
+            checkUpdate();
+        }
+
+        async function checkUpdate(){
+            if(update){
+                console.log("NO:", update)
+                await sleep(10);
+                checkUpdate()
+            }
+            else{
+                console.log("update")
+                update = true;
+                closing = false;
+                Old = Math.floor(Date.now() / 1000);
+                getUpdate(Old, RoomId)
+            }
+        }
+
+        async function scroll(){
+            if(document.getElementById('messages_container').innerHTML.trim().length == 0){
+                await sleep(10)
+                scroll()
+            }
+            else{window.scrollTo(0, document.body.scrollHeight); inChat = true;}
+        }
+
+        async function sleep(ms) {
+            return new Promise(resolve => setTimeout(resolve, ms));
+        }
+
+        async function getUpdate(old, id){
+            console.log("request")
+            let done = false
+            fetch('{% url "get_update" %}' + `?old=${old}&id=${id}&user=${me}`)
+            .then(response => response.json())
+            .then(data => {
+                let messages = JSON.parse(data.messages)
+                console.log('\n')
+                console.log(messages)
+                Old = JSON.parse(data.old)
+                console.log(`old:${old};curr:${Old}`)
+                done = true
+
+                if (messages.length == 0){return}
+
+                const types = {'audio':set_audio, 'text': set_text, 'photo':set_photo, 'video':set_video, 'document':set_document,'tag':set_tag}
+
+                messages.map(message => {
+                    if(message.fields.from_user != me){
+                    content = types[message.fields.typeOfMessage](message.fields.text)
+                            document.querySelector('#messages_container').innerHTML += `
+                            <div class="their_message">
+                        <div class="chat_username_message_their">
+                            ${message.fields.departmentName}
+                        </div>
+                        <div class="content_their">
+                            ${content}
+                        </div>
+                    </div>
+                    `
+                }
+            })
+            })
+
+            await sleep(2000)
+            if(closing){update = false}
+            if(update){getUpdate(Old, RoomId)}
+        }
+
+        function checkEnter(event) {
+            if (event.keyCode === 13) {
+                event.preventDefault(); // Предотвращаем переход на новую строку в <textarea>
+                send();
+            }
+        }
+
+        function send() {
+            const messageInputDom = document.querySelector('#message');
+            const message = messageInputDom.value;
+            let IsTag = 'text'; 
+        
+            if (message.includes('@')) {
+                IsTag = 'tag';
+            }
+            console.log(IsTag)
+            document.querySelector('#messages_container').innerHTML += `
+                <div class="our_message">
+                    <div class="chat_username_message_us">
+                        Me
+                    </div>
+                    <div class="content_us">
+                        <div>${message}</div>
+                    </div>
+                </div>
+            `;
+        
+            fetch('{% url "send_message" %}' + `?chat=${RoomId}&message=${message}&department=${department}&user=${me}&typeOfMessage=${IsTag}`)
+                .then(response => response.json())
+                .then(data => {
+                    console.log("ok");
+                });
+        
+            messageInputDom.value = '';
+        }
+        
+        function to_users() {
+            closing = true;
+            inChat = false;
+            count = 0;
+
+            let content = document.querySelector(".content");
+            let header = document.querySelector(".header");
+            header.style.display="block";
+            header.style.padding = "0px";
+            
+            fetch('{% url "get_unrecieved" %}' + `?user=${me}`)
+            .then(response => response.json())
+            .then(data => {
+                unrec = JSON.parse(data.unrec)
+                content.innerHTML = `<div class="number_chats">Number of chats: ${data.number_chats}</div>`;
+            chats.map((chat, index) =>{
+                    content.innerHTML+=`
+                    <div class="user_chat " id="${chat.pk}" onclick="enter_chat(${chat.pk}, '')">
+                        ${chat.fields.img != null ? set_avatar(chat.fields.img) : ''}
+                            <div class="name_chat">
+                                ${chat.fields.chat_name}
+                            </div>
+                        ${unrec[index].fields.taged  ?
+                            `<div class="tag">
+                                <svg fill="#000000" height="12px" width="12px" version="1.1" id="Capa_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" 
+                                    viewBox="0 0 490.2 490.2" xml:space="preserve">
+                                    <g>
+                                    <path d="M420.95,61.8C376.25,20.6,320.65,0,254.25,0c-69.8,0-129.3,23.4-178.4,70.3s-73.7,105.2-73.7,175
+                                        c0,66.9,23.4,124.4,70.1,172.6c46.9,48.2,109.9,72.3,189.2,72.3c47.8,0,94.7-9.8,140.7-29.5c15-6.4,22.3-23.6,16.2-38.7l0,0
+                                        c-6.3-15.6-24.1-22.8-39.6-16.2c-40,17.2-79.2,25.8-117.4,25.8c-60.8,0-107.9-18.5-141.3-55.6c-33.3-37-50-80.5-50-130.4
+                                        c0-54.2,17.9-99.4,53.6-135.7c35.6-36.2,79.5-54.4,131.5-54.4c47.9,0,88.4,14.9,121.4,44.7s49.5,67.3,49.5,112.5
+                                        c0,30.9-7.6,56.7-22.7,77.2c-15.1,20.6-30.8,30.8-47.1,30.8c-8.8,0-13.2-4.7-13.2-14.2c0-7.7,0.6-16.7,1.7-27.1l18.6-152.1h-64
+                                        l-4.1,14.9c-16.3-13.3-34.2-20-53.6-20c-30.8,0-57.2,12.3-79.1,36.8c-22,24.5-32.9,56.1-32.9,94.7c0,37.7,9.7,68.2,29.2,91.3
+                                        c19.5,23.2,42.9,34.7,70.3,34.7c24.5,0,45.4-10.3,62.8-30.8c13.1,19.7,32.4,29.5,57.9,29.5c37.5,0,69.9-16.3,97.2-49
+                                        c27.3-32.6,41-72,41-118.1C488.05,152.9,465.75,103,420.95,61.8z M273.55,291.9c-11.3,15.2-24.8,22.9-40.5,22.9
+                                        c-10.7,0-19.3-5.6-25.8-16.8c-6.6-11.2-9.9-25.1-9.9-41.8c0-20.6,4.6-37.2,13.8-49.8s20.6-19,34.2-19c11.8,0,22.3,4.7,31.5,14.2
+                                        s13.8,22.1,13.8,37.9C290.55,259.2,284.85,276.6,273.55,291.9z"/>
+                                    </g>
+                                </svg>
+                            </div>`:''}
+                        ${unrec[index].fields.unrecieved != 0 ?
+                            `<div class="unchecked">
+                        ${unrec[index].fields.unrecieved}</div>` : ''}
+                            </div>
+                     </div>
+                    `;
+                    if(unrec[index].fields.folder =='accident')
+                    {
+                        document.getElementById(`${chat.pk}`).classList.add('accident')
+                    }else if(unrec[index].fields.folder =='landing')
+                    {
+                        document.getElementById(`${chat.pk}`).classList.add('landing')
+                    }else if(unrec[index].fields.folder =='change')
+                    {
+                        document.getElementById(`${chat.pk}`).classList.add('change')
+                    }else if(unrec[index].fields.folder =='return')
+                    {
+                        document.getElementById(`${chat.pk}`).classList.add('return')
+                    }else if(unrec[index].fields.folder =='problems')
+                    {
+                        document.getElementById(`${chat.pk}`).classList.add('problems')
+                    }
+                })
+                
+                
+            })  
+            
+
+
+
+            header.innerHTML=`
+                <div class="input-container">
+
+                    <svg class="input-icon" version="1.0" xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 1280.000000 1276.000000" preserveAspectRatio="xMidYMid meet">
+                        <g transform="translate(0.000000,1276.000000) scale(0.100000,-0.100000)"
+                            fill="white" stroke="none">
+                            <path d="M4600 12749 c-1217 -85 -2313 -580 -3160 -1429 -788 -790 -1271 -1788 -1404 -2905 -153 -1278 200 -2564 983 -3585 181 -237 501 -570 726 -759 316 -263 641 -473 1020 -657 537 -261 1052 -404 1715 -476 183 -19 720 -16 925 5 703 75 1359 282 1948 614 l98 56 87 -85 c48 -46 805 -782 1683 -1634 877 -853 1618 -1571 1646 -1596 227 -202 530 -311 818 -295 180 10 292 40 460 122 132 65 213 125 323 239 341 355 427 879 217 1323 -62 132 -134 231 -260 359 -60 61 -829 808 -1707 1658 -879 851 -1598 1551 -1598 1555 0 5 25 51 55 102 135 226 282 545 377 814 182 516 271 993 285 1540 20 806 -143 1565 -491 2280 -239 491 -521 893 -896 1279 -379 389 -794 695 -1275 942 -789 404 -1704 594 -2575 533z m502 -1973 c478 -20 1000 -194 1425 -475 1366 -904 1746 -2702 857 -4061 -221 -338 -521 -638 -864 -863 -892 -586 -2052 -635 -2983 -127 -736 401 -1266 1079 -1468 1877 -68 269 -83 398 -83 713 0 236 3 296 23 420 49 316 127 569 260 845 151 314 327 560 576 810 463 465 1049 757 1695 845 9013 355 28 405 23 17 -1 87 -5 157 -7z"></g>
+                    </svg>
+
+                    <input class="input-field" type="text" placeholder="Search"  onkeyup="searchChats(this.value)">
+
+                    
+                </div>
+                <div class="folders">
+                    <div class="folder" onclick="to_users()">Все</div>
+                    <div class="folder" onclick="to_folder('accident')">Авария</div>
+                    <div class="folder" onclick="to_folder('landing')" >Посадка</div>
+                    <div class="folder" onclick="to_folder('change')">Замена</div>
+                    <div class="folder" onclick="to_folder('return')">Возврат</div>
+                    <div class="folder" onclick="to_folder('problems')">Проблемный</div>
+                </div>`
+
+        }
+
+        function set_avatar(content){
+            static = `{% static "" %}${content}`
+            return `<img src = "${static}">`
+        }
+
+        function set_audio(content){
+            static = `{% static "" %}${content}.ogg`
+            return `<audio controls id="audio">
+                        <source src='${static}' type="audio/ogg">`
+        }
+
+        function set_text(content){
+            return `<div>${content}</div>`
+        }
+
+        function set_photo(content){
+            static = `{% static "" %}${content}`
+            return `<img src = '${static}' class="zoomed-image" onclick="OpenImage(event)">
+            <img class="zoomed-view" src="${static}" onclick="CloseImage(event)">
+
+            `
+        }
+
+        function set_video(content){
+            static = `{% static "" %}${content}`
+            return `<video src="${static}" width="300" height="200" controls>`
+        }
+
+        function set_tag(content) {
+            return content.split(' ').map(word => {
+                if (word.startsWith('@')) {
+                    return `&nbsp;<div class="taged_message">${word}</div>&nbsp;`;
+                }
+                return word;
+            }).join('');
+        }
+
+        function set_document(content){
+            static = `{% static "" %}${content}`
+            return `<a href = "${static}" download><svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" version="1.1" width="40" height="40" viewBox="0 0 256 256" xml:space="preserve">
+
+            <defs>
+            </defs>
+            <g style="stroke: none; stroke-width: 0; stroke-dasharray: none; stroke-linecap: butt; stroke-linejoin: miter; stroke-miterlimit: 10; fill: none; fill-rule: nonzero; opacity: 1;" transform="translate(1.4065934065934016 1.4065934065934016) scale(2.81 2.81)" >
+                <path d="M 77.474 17.28 L 61.526 1.332 C 60.668 0.473 59.525 0 58.311 0 H 15.742 c -2.508 0 -4.548 2.04 -4.548 4.548 v 80.904 c 0 2.508 2.04 4.548 4.548 4.548 h 58.516 c 2.508 0 4.549 -2.04 4.549 -4.548 V 20.496 C 78.807 19.281 78.333 18.138 77.474 17.28 z M 61.073 5.121 l 12.611 12.612 H 62.35 c -0.704 0 -1.276 -0.573 -1.276 -1.277 V 5.121 z M 74.258 87 H 15.742 c -0.854 0 -1.548 -0.694 -1.548 -1.548 V 4.548 C 14.194 3.694 14.888 3 15.742 3 h 42.332 v 13.456 c 0 2.358 1.918 4.277 4.276 4.277 h 13.457 v 64.719 C 75.807 86.306 75.112 87 74.258 87 z" style="stroke: none; stroke-width: 1; stroke-dasharray: none; stroke-linecap: butt; stroke-linejoin: miter; stroke-miterlimit: 10; fill: rgb(0,0,0); fill-rule: nonzero; opacity: 1;" transform=" matrix(1 0 0 1 0 0) " stroke-linecap="round" />
+                <path d="M 68.193 33.319 H 41.808 c -0.829 0 -1.5 -0.671 -1.5 -1.5 s 0.671 -1.5 1.5 -1.5 h 26.385 c 0.828 0 1.5 0.671 1.5 1.5 S 69.021 33.319 68.193 33.319 z" style="stroke: none; stroke-width: 1; stroke-dasharray: none; stroke-linecap: butt; stroke-linejoin: miter; stroke-miterlimit: 10; fill: rgb(0,0,0); fill-rule: nonzero; opacity: 1;" transform=" matrix(1 0 0 1 0 0) " stroke-linecap="round" />
+                <path d="M 34.456 33.319 H 21.807 c -0.829 0 -1.5 -0.671 -1.5 -1.5 s 0.671 -1.5 1.5 -1.5 h 12.649 c 0.829 0 1.5 0.671 1.5 1.5 S 35.285 33.319 34.456 33.319 z" style="stroke: none; stroke-width: 1; stroke-dasharray: none; stroke-linecap: butt; stroke-linejoin: miter; stroke-miterlimit: 10; fill: rgb(0,0,0); fill-rule: nonzero; opacity: 1;" transform=" matrix(1 0 0 1 0 0) " stroke-linecap="round" />
+                <linearGradient id="SVGID_1" gradientUnits="userSpaceOnUse" x1="21.8064" y1="19.2332" x2="42.2984" y2="19.2332">
+            <stop offset="0%" style="stop-color:rgb(255,255,255);stop-opacity: 1"/>
+            <stop offset="100%" style="stop-color:rgb(0,0,0);stop-opacity: 1"/>
+            </linearGradient>
+            <line x1="-10.246" y1="0" x2="10.246" y2="0" style="stroke: none; stroke-width: 1; stroke-dasharray: none; stroke-linecap: butt; stroke-linejoin: miter; stroke-miterlimit: 10; fill: url(#SVGID_1); fill-rule: nonzero; opacity: 1;" transform=" matrix(1 0 0 1 0 0) "/>
+                <path d="M 42.298 20.733 H 21.807 c -0.829 0 -1.5 -0.671 -1.5 -1.5 s 0.671 -1.5 1.5 -1.5 h 20.492 c 0.829 0 1.5 0.671 1.5 1.5 S 43.127 20.733 42.298 20.733 z" style="stroke: none; stroke-width: 1; stroke-dasharray: none; stroke-linecap: butt; stroke-linejoin: miter; stroke-miterlimit: 10; fill: rgb(0,0,0); fill-rule: nonzero; opacity: 1;" transform=" matrix(1 0 0 1 0 0) " stroke-linecap="round" />
+                <path d="M 68.193 44.319 H 21.807 c -0.829 0 -1.5 -0.671 -1.5 -1.5 s 0.671 -1.5 1.5 -1.5 h 46.387 c 0.828 0 1.5 0.671 1.5 1.5 S 69.021 44.319 68.193 44.319 z" style="stroke: none; stroke-width: 1; stroke-dasharray: none; stroke-linecap: butt; stroke-linejoin: miter; stroke-miterlimit: 10; fill: rgb(0,0,0); fill-rule: nonzero; opacity: 1;" transform=" matrix(1 0 0 1 0 0) " stroke-linecap="round" />
+                <path d="M 48.191 55.319 H 21.807 c -0.829 0 -1.5 -0.672 -1.5 -1.5 s 0.671 -1.5 1.5 -1.5 h 26.385 c 0.828 0 1.5 0.672 1.5 1.5 S 49.02 55.319 48.191 55.319 z" style="stroke: none; stroke-width: 1; stroke-dasharray: none; stroke-linecap: butt; stroke-linejoin: miter; stroke-miterlimit: 10; fill: rgb(0,0,0); fill-rule: nonzero; opacity: 1;" transform=" matrix(1 0 0 1 0 0) " stroke-linecap="round" />
+                <path d="M 68.193 55.319 H 55.544 c -0.828 0 -1.5 -0.672 -1.5 -1.5 s 0.672 -1.5 1.5 -1.5 h 12.649 c 0.828 0 1.5 0.672 1.5 1.5 S 69.021 55.319 68.193 55.319 z" style="stroke: none; stroke-width: 1; stroke-dasharray: none; stroke-linecap: butt; stroke-linejoin: miter; stroke-miterlimit: 10; fill: rgb(0,0,0); fill-rule: nonzero; opacity: 1;" transform=" matrix(1 0 0 1 0 0) " stroke-linecap="round" />
+                <path d="M 68.193 66.319 H 21.807 c -0.829 0 -1.5 -0.672 -1.5 -1.5 s 0.671 -1.5 1.5 -1.5 h 46.387 c 0.828 0 1.5 0.672 1.5 1.5 S 69.021 66.319 68.193 66.319 z" style="stroke: none; stroke-width: 1; stroke-dasharray: none; stroke-linecap: butt; stroke-linejoin: miter; stroke-miterlimit: 10; fill: rgb(0,0,0); fill-rule: nonzero; opacity: 1;" transform=" matrix(1 0 0 1 0 0) " stroke-linecap="round" />
+                <path d="M 68.193 77.319 H 55.544 c -0.828 0 -1.5 -0.672 -1.5 -1.5 s 0.672 -1.5 1.5 -1.5 h 12.649 c 0.828 0 1.5 0.672 1.5 1.5 S 69.021 77.319 68.193 77.319 z" style="stroke: none; stroke-width: 1; stroke-dasharray: none; stroke-linecap: butt; stroke-linejoin: miter; stroke-miterlimit: 10; fill: rgb(0,0,0); fill-rule: nonzero; opacity: 1;" transform=" matrix(1 0 0 1 0 0) " stroke-linecap="round" />
+            </g>
+            </svg> Download`
+        }
+
+        function load(){
+            count++;
+            fetch('{% url "get_old" %}' + `?id=${RoomId}&count=${count}`)
+            .then(response => response.json())
+            .then(data => {
+                let messages = JSON.parse(data.messages)
+                console.log(messages)
+
+                const types = {'audio':set_audio, 'text': set_text, 'photo':set_photo, 'video':set_video, 'document':set_document,'tag':set_tag}
+                container = document.querySelector('#messages_container')
+
+                messages.map(message => {
+                    const newElement = document.createElement('div')
+                    if(message.fields.from_user == me){
+                    newElement.classList.add('our_message')
+                    newElement.innerHTML += `<div class="chat_username_message_us">
+                        Me
+                    </div>
+                    <div class="content_us">
+                        <div>${message.fields.text}</div>
+                    </div>`
+                }
+                else{
+                    newElement.classList.add('their_message')
+                    content = types[message.fields.typeOfMessage](message.fields.text)
+                    newElement.innerHTML += `
+                    <div class="chat_username_message_their">
+                    ${message.fields.departmentName}
+                        </div>
+                        <div class="content_their">
+                            ${content}
+                        </div>
+                    </div>`
+                }
+                container.insertBefore(newElement, container.firstChild)
+            })
+            })
+        }
+
+        function isScrolledToTop(){
+            return (document.documentElement.scrollTop || document.body.scrollTop) === 0
+        }
+
+        window.addEventListener('scroll', function() {
+            if (inChat && isScrolledToTop()) {
+                console.log('User has scrolled to the top');
+                load();
+            }
+        });
+
+        function searchChats(value) {
+            let chats = document.getElementsByClassName('user_chat');
+
+            for (let i = 0; i < chats.length; i++) {
+                let chatName = chats[i].getElementsByClassName('name_chat')[0].textContent.toLowerCase();
+                value = value.toLowerCase(); 
+                chats[i].style.display = chatName.includes(value) ? '' : 'none';
+            }
+        }
+
+        function OpenImage(event) {
+            let thumbnail = event.target;
+            let zoomedView = document.querySelector('.zoomed-view');
+
+            thumbnail.style.display = 'none';
+            zoomedView.src = thumbnail.src;
+            zoomedView.setAttribute('data-thumbnail', thumbnail.src);
+            zoomedView.style.display = 'block';
+
+            document.body.style.overflow = 'hidden';
+            document.body.classList.add('blur-background');
+            console.log("+");
+        }
+
+        function CloseImage(event){
+                let zoomedView = event.target;
+
+                zoomedView.style.display = 'none';
+
+                let thumbnailSource = zoomedView.getAttribute('data-thumbnail');
+                let thumbnails = document.querySelectorAll('.zoomed-image');
+                let thumbnail;
+
+                for (let i = 0; i < thumbnails.length; i++) {
+                    if (thumbnails[i].src == thumbnailSource) {
+                        thumbnail = thumbnails[i];
+                        break;
+                    }
+                }
+
+                if (thumbnail) {
+                    thumbnail.style.display = 'block';
+                }
+
+                document.body.style.overflow = 'scroll';
+                document.body.classList.remove('blur-background');
+                console.log("-");
+        }
+
+        function filterUsers(event) {
+            let textArea = document.getElementById('message');
+            let userList = document.getElementById('userList');
+            let userOptions = document.getElementById('userOptions');
+        
+            // Check if the "@" symbol is entered
+            if (event.key === '@') {
+                userList.style.display = 'block';
+                let atPosition = textArea.value.lastIndexOf('@');
+        
+                // Add "@" symbol before each user in the list
+                userOptions.innerHTML = users.map(user => `<li>@${user}</li>`).join('');
+            } else {
+                userList.style.display = 'none';
+            }
+        
+            userList.onclick = function(event) {
+                let target = event.target;
+                if (target.tagName === 'LI') {
+                    let atPosition = textArea.value.lastIndexOf('@');
+                    textArea.value = textArea.value.slice(0, atPosition) + target.textContent + ' '; 
+                    userList.style.display = 'none';
+                }
+            }
+        }
+        
+</script>
+</body>
+
+</html>
