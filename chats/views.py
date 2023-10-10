@@ -3,13 +3,17 @@ from .models import Chat, Message, Users, UnrecievedMessages
 from django.core import serializers
 from time import time
 import asyncio
-from django.shortcuts import render
+from django.shortcuts import redirect
 from .db_manager import DBManager
 from . import bot_documents, bot_sales, bot_trucks
 from .bots import BOTS
 import re
-from django.db.models import F, Case, When, Value
-from django.db import connection
+from django.db.models import Case, When, Value
+import pymongo
+from django.views.decorators.csrf import csrf_exempt
+from .bitrix_methods import get_user_id_by_auth, tg_id_by_contact_id
+import json
+from .sql_queries import get_messages
 
 # Create your views here.
 def index(request, user):
@@ -29,24 +33,28 @@ def index(request, user):
     ), "chat__chat_name").values('chat', 'user', 'unrecieved', 'taged', 'folder', 'chat__chat_name', 'chat__img'))
 
 
-    return JsonResponse(data={"chats_rel":unrecieved_messages, 'count_of_chats':count_of_chats, 'me':user, 'department':Users.objects.get(id=user).department.name})
+    return JsonResponse(data={"chats_rel":unrecieved_messages, 'count_of_chats':count_of_chats, 'me':user})
 
 def enter_chat(request):
-    messages = list(Message.objects.filter(chat=request.GET.get('id')).all())[-30:]
+    chat = request.GET.get('id')
+    user = request.GET.get('user')
 
-    recieve = UnrecievedMessages.objects.get(chat=request.GET.get('id'), user=request.GET.get('user'))
+    messages = get_messages(chat)
+
+    recieve = UnrecievedMessages.objects.get(chat=chat, user=user)
     recieve.unrecieved = 0
     recieve.taged = 0
     recieve.save()
 
-    chat = Chat.objects.get(id=request.GET.get('id'))
-    users_in_chat = chat.users.count()
+    chat = Chat.objects.get(id=chat)
+    users_in_chat = UnrecievedMessages.objects.filter(chat=chat).count()
     chat_name = chat.chat_name
 
-    departments = chat.users.values("department__name").distinct()
-    department_names = [department['department__name'] for department in departments]
+    departments = UnrecievedMessages.objects.filter(chat=chat).values("user__department__name").distinct()
+    department_names = [department['user__department__name'] for department in departments]
+    dep_name = Users.objects.get(id=user).department.name
 
-    return JsonResponse(data={'messages':serializers.serialize('json', messages), 'users_in_chat':users_in_chat, 'chat_name':chat_name, 'departments':department_names})
+    return JsonResponse(data={'messages':messages, 'users_in_chat':users_in_chat, 'chat_name':chat_name, 'departments':department_names, 'department':dep_name})
 
 def get_update(request):
     chat = int(request.GET.get('id'))
@@ -54,7 +62,7 @@ def get_update(request):
     cur_time = int(time())
 
     if Message.objects.filter(chat=chat).filter(time__gte=old_time).filter(time__lt=cur_time).exists():
-        messages = Message.objects.filter(chat=chat).filter(time__gte=old_time).filter(time__lt=cur_time).all()
+        messages = Message.objects.filter(chat=chat).filter(time__gte=old_time).filter(time__lt=cur_time).order_by('id').all()
         recieve = UnrecievedMessages.objects.get(chat=request.GET.get('id'), user=request.GET.get('user'))
         recieve.unrecieved = 0
         recieve.taged = 0
@@ -70,6 +78,20 @@ def send_message(request):
     department=request.GET.get('department')
     typeOfMessage=request.GET.get('typeOfMessage')
 
+    myclient = pymongo.MongoClient("mongodb+srv://test_mongodb:123@cluster0.ev4zkwl.mongodb.net/?retryWrites=true&w=majority")
+    mydb = myclient["test"]
+    mycol = mydb["buffered-messages"]
+    query = {str(chat): {"$exists": True}}
+    result = mycol.find_one(query)
+    if result:
+        messages = result[str(chat)]
+        messages.append(message)
+        # Update the document in MongoDB to add the text to the array
+        mycol.update_one({"_id": result["_id"]}, {"$set": {str(chat): messages}})
+    else:
+        # If chat_id does not exist, create a new document with the chat_id and text array
+        mycol.insert_one({str(chat): [message]})
+    myclient.close()
     try:
         tgid = asyncio.run(BOTS["truck_rental_bot"].send_message(chat, message))
         db = DBManager()
@@ -87,12 +109,17 @@ def send_message(request):
 
 def get_old(request):
     count = int(request.GET.get('count'))
-    print(count)
-    messages = list(Message.objects.filter(chat=request.GET.get('id')).all())[-30*(count+1):-30*(count)]
-    return JsonResponse(data={'messages':serializers.serialize('json', messages)})
+    print(-30*(count+1), -30*count)
 
-def index_chat(request, user, chat):
-    return render(request, 'chats/index_chat.html', {'chat':chat, 'me':user, 'chats_ser':serializers.serialize('json', Chat.objects.filter(users=Users.objects.get(id=user)).order_by('chat_name')), 'department':Users.objects.get(id=user).department.name})
+    all_messages = Message.objects.filter(chat=request.GET.get('id')).order_by('-id').all()
+    all = all_messages.count()
+    print(all)
+
+    messages = list(all_messages)[count*30:(count+1)*30]
+
+    print(messages)
+
+    return JsonResponse(data={'messages':serializers.serialize('json', messages)})
 
 def get_urecieved_messages(request):
     user = request.GET.get('user')
@@ -101,22 +128,10 @@ def get_urecieved_messages(request):
     unrec = UnrecievedMessages.objects.filter(user=Users.objects.get(id=user)).order_by('chat__chat_name').all()
     return JsonResponse(data={'unrec':serializers.serialize('json', unrec), 'number_chats':count_of_chats})
 
-def custom_sql_request(user):
-    # Write your custom SQL query here
-    sql_query = """
-        SELECT *
-        FROM chats_unrecievedmessages u
-        JOIN chats_chat c ON u.chat_id = c.id
-        WHERE u.user_id = %s
-    """
+@csrf_exempt
+def bitrix(request):
+    if(request.method == "POST"):
+        print(request.POST)
+        print(tg_id_by_contact_id(json.loads(request.POST['PLACEMENT_OPTIONS'])['ID']))
+        return redirect('https://messengerwebapp.netlify.app/'+get_user_id_by_auth(request.POST['AUTH_ID']) + '/'+ tg_id_by_contact_id(json.loads(request.POST['PLACEMENT_OPTIONS'])['ID'])+'/')
 
-    # Define any parameters for the SQL query
-    params = [user]
-
-    rows = None
-    # Execute the custom SQL query
-    with connection.cursor() as cursor:
-        cursor.execute(sql_query, params)
-
-        rows = cursor.fetchall()
-    return rows
